@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Evan!</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Creepster&family=Special+Elite&display=swap');
+
+  :root {
+    --green: #00ff41;
+    --dim-green: #00aa2a;
+    --dark-green: #003a0f;
+    --red: #ff2200;
+    --amber: #ffb300;
+    --bg: #050a05;
+    --panel: #0a120a;
+    --border: #1a2e1a;
+    --scanline: rgba(0,255,65,0.03);
+    --glow: 0 0 10px #00ff41, 0 0 20px #00ff4166;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--green);
+    height: 100vh;
+    overflow: hidden;
+    cursor: default;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      var(--scanline) 2px,
+      var(--scanline) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.85) 100%);
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  #intro {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    background: var(--bg);
+    animation: flicker 0.15s infinite;
+  }
+
+  #intro h1 {
+    font-family: 'Creepster', cursive;
+    font-size: clamp(2rem, 6vw, 5rem);
+    color: var(--amber);
+    text-shadow: 0 0 20px var(--amber), 0 0 40px #ff6600;
+    letter-spacing: 4px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  #intro .subtitle {
+    font-size: clamp(0.6rem, 1.5vw, 0.9rem);
+    color: var(--dim-green);
+    letter-spacing: 6px;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+  }
+
+  #intro .blink-text {
+    font-size: clamp(0.7rem, 1.5vw, 1rem);
+    color: var(--green);
+    animation: blink 1.2s step-end infinite;
+    letter-spacing: 3px;
+    cursor: pointer;
+    border: 1px solid var(--green);
+    padding: 10px 30px;
+    text-shadow: var(--glow);
+    box-shadow: var(--glow);
+  }
+
+  #intro .blink-text:hover {
+    background: var(--green);
+    color: var(--bg);
+  }
+
+  @keyframes blink { 50% { opacity: 0; } }
+  @keyframes flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+    20%, 22%, 24%, 55% { opacity: 0.92; }
+  }
+
+  #main-ui {
+    display: none;
+    flex-direction: column;
+    height: 100vh;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  #topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--border);
+    padding: 6px 16px;
+    background: var(--panel);
+    flex-shrink: 0;
+  }
+
+  #topbar .logo {
+    font-family: 'Creepster', cursive;
+    font-size: clamp(0.8rem, 2vw, 1.4rem);
+    color: var(--amber);
+    text-shadow: 0 0 10px var(--amber);
+    letter-spacing: 2px;
+  }
+
+  #topbar .sys-info {
+    font-size: clamp(0.5rem, 1.2vw, 0.75rem);
+    color: var(--dim-green);
+    text-align: right;
+    line-height: 1.6;
+  }
+
+  #clock {
+    color: var(--green);
+    font-size: clamp(0.7rem, 1.5vw, 1rem);
+    text-shadow: var(--glow);
+  }
+
+  #workspace {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  #camera-feed {
+    flex: 1;
+    border: 2px solid var(--border);
+    background: #000;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #cam-label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: clamp(0.5rem, 1.2vw, 0.75rem);
+    color: var(--green);
+    text-shadow: var(--glow);
+    letter-spacing: 2px;
+    z-index: 10;
+  }
+
+  #cam-corner {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: clamp(0.4rem, 1vw, 0.65rem);
+    color: var(--dim-green);
+    z-index: 10;
+    text-align: right;
+    line-height: 1.8;
+  }
+
+  #noise-canvas {
+    position: absolute;
+    inset: 0;
+    opacity: 0.06;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .cam-scene {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: #050505;
+  }
+
+  .cam-scene.active { display: flex; }
+
+  .cam-scene::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0,60,0,0.18) 0%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .animatronic {
+    height: clamp(140px, 30vh, 320px);
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 20px rgba(0,255,65,0.3)) drop-shadow(0 0 40px rgba(0,0,0,0.8));
+    animation: breathe 3s ease-in-out infinite;
+    position: relative;
+    z-index: 3;
+    image-rendering: auto;
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.04) translateY(-6px); }
+  }
+
+  .cam-message {
+    font-family: 'Creepster', cursive;
+    font-size: clamp(1rem, 3.5vw, 2.5rem);
+    color: var(--amber);
+    text-shadow: 0 0 15px var(--amber), 0 0 30px #ff6600;
+    text-align: center;
+    margin-top: 12px;
+    letter-spacing: 2px;
+    z-index: 3;
+    position: relative;
+    animation: textFlicker 4s infinite;
+    padding: 0 20px;
+  }
+
+  .cam-sub {
+    font-size: clamp(0.5rem, 1.3vw, 0.85rem);
+    color: var(--dim-green);
+    margin-top: 8px;
+    letter-spacing: 3px;
+    z-index: 3;
+    position: relative;
+    text-align: center;
+  }
+
+  .cam-name {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-family: 'Special Elite', cursive;
+    font-size: clamp(0.7rem, 2vw, 1.1rem);
+    color: rgba(0,255,65,0.5);
+    letter-spacing: 4px;
+    z-index: 3;
+  }
+
+  @keyframes textFlicker {
+    0%, 95%, 100% { opacity: 1; }
+    96%, 99% { opacity: 0.7; }
+    97% { opacity: 0.3; }
+  }
+
+  #jumpscare-scene {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+    background: #000;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  #jumpscare-scene.active { display: flex; }
+
+  #jumpscare-img {
+    width: min(80vw, 500px);
+    height: auto;
+    border-radius: 8px;
+    animation: jumpIn 0.15s ease-out forwards;
+    filter: drop-shadow(0 0 40px #ff2200) drop-shadow(0 0 80px #ff0000);
+  }
+
+  @keyframes jumpIn {
+    0% { transform: scale(0.3) rotate(-5deg); opacity: 0; }
+    60% { transform: scale(1.15) rotate(2deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+
+  #jumpscare-text {
+    font-family: 'Creepster', cursive;
+    font-size: clamp(2rem, 7vw, 5rem);
+    color: #ff2200;
+    text-shadow: 0 0 20px #ff0000, 0 0 50px #ff6600;
+    margin-top: 20px;
+    text-align: center;
+    animation: jumpIn 0.2s 0.1s ease-out both;
+    letter-spacing: 4px;
+  }
+
+  #jumpscare-sub {
+    font-size: clamp(0.6rem, 1.5vw, 1rem);
+    color: rgba(255,255,255,0.6);
+    margin-top: 10px;
+    letter-spacing: 3px;
+    animation: jumpIn 0.2s 0.2s ease-out both;
+  }
+
+  #scream-bars {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      rgba(255,0,0,0.08) 0px, rgba(255,0,0,0.08) 4px,
+      transparent 4px, transparent 20px
+    );
+    pointer-events: none;
+  }
+
+  .red-flash {
+    position: fixed;
+    inset: 0;
+    background: #ff0000;
+    z-index: 4999;
+    animation: flashOut 0.3s ease-out forwards;
+    pointer-events: none;
+  }
+
+  @keyframes flashOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  #side-panel {
+    width: clamp(180px, 22vw, 280px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .panel-box {
+    border: 1px solid var(--border);
+    background: var(--panel);
+    padding: 10px;
+  }
+
+  .panel-title {
+    font-size: clamp(0.45rem, 1vw, 0.65rem);
+    color: var(--dim-green);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+  }
+
+  #cam-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .cam-btn {
+    background: #060d06;
+    border: 1px solid var(--border);
+    color: var(--dim-green);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(0.45rem, 1vw, 0.65rem);
+    padding: 8px 4px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-align: center;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+    line-height: 1.5;
+  }
+
+  .cam-btn:hover, .cam-btn.active {
+    background: var(--dark-green);
+    border-color: var(--green);
+    color: var(--green);
+    text-shadow: var(--glow);
+    box-shadow: inset 0 0 10px rgba(0,255,65,0.1), var(--glow);
+  }
+
+  .cam-btn .cam-num {
+    font-family: 'Creepster', cursive;
+    font-size: clamp(0.9rem, 2vw, 1.4rem);
+    display: block;
+    color: var(--green);
+    text-shadow: var(--glow);
+  }
+
+  .cam-btn.danger { border-color: #330000; }
+  .cam-btn.danger .cam-num { color: var(--red); text-shadow: 0 0 10px var(--red); }
+  .cam-btn.danger:hover, .cam-btn.danger.active {
+    border-color: var(--red);
+    background: #1a0000;
+    color: var(--red);
+    text-shadow: 0 0 10px var(--red);
+    box-shadow: inset 0 0 10px rgba(255,0,0,0.1), 0 0 10px rgba(255,0,0,0.4);
+  }
+
+  #alert-log {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  #log-content {
+    font-size: clamp(0.4rem, 0.9vw, 0.6rem);
+    color: var(--dim-green);
+    line-height: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .log-line { opacity: 0; animation: fadeInLog 0.5s forwards; }
+  @keyframes fadeInLog { to { opacity: 1; } }
+
+  .log-warn { color: var(--amber); }
+  .log-err  { color: var(--red); }
+
+  #power-bar-wrap {
+    height: 8px;
+    background: #0a0a0a;
+    border: 1px solid var(--border);
+    margin-top: 6px;
+    overflow: hidden;
+  }
+
+  #power-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--dim-green), var(--green));
+    transition: width 1s linear;
+    box-shadow: 0 0 6px var(--green);
+  }
+
+  #power-label {
+    font-size: clamp(0.4rem, 0.9vw, 0.6rem);
+    color: var(--dim-green);
+    margin-top: 4px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  #bottombar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--border);
+    padding: 6px 16px;
+    background: var(--panel);
+    flex-shrink: 0;
+  }
+
+  #bottombar .status {
+    display: flex;
+    gap: 20px;
+    font-size: clamp(0.4rem, 1vw, 0.65rem);
+    color: var(--dim-green);
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    animation: pulse 2s infinite;
+    margin-right: 5px;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  #static-overlay {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    display: none;
+  }
+
+  #finale {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 6000;
+    background: linear-gradient(135deg, #0d0020, #200010, #001a10);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 30px;
+  }
+
+  #finale.active { display: flex; }
+
+  #finale h1 {
+    font-family: 'Creepster', cursive;
+    font-size: clamp(2.5rem, 8vw, 6rem);
+    background: linear-gradient(90deg, #ff6600, #ffcc00, #ff6600);
+    background-size: 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 2s linear infinite, popIn 0.5s ease-out both;
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+  }
+
+  @keyframes shimmer { to { background-position: 200% center; } }
+  @keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  #finale p {
+    font-family: 'Special Elite', cursive;
+    font-size: clamp(0.9rem, 2.5vw, 1.5rem);
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+    animation: popIn 0.5s 0.3s ease-out both;
+  }
+
+  .confetti-piece {
+    position: absolute;
+    width: 10px; height: 10px;
+    opacity: 0;
+    animation: confettiFall linear forwards;
+    border-radius: 2px;
+  }
+
+  @keyframes confettiFall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  #finale .emoji-row {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    animation: popIn 0.5s 0.5s ease-out both;
+    margin: 10px 0;
+  }
+
+  #finale .restart-btn {
+    margin-top: 20px;
+    padding: 10px 30px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.6);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(0.6rem, 1.5vw, 0.85rem);
+    letter-spacing: 3px;
+    cursor: pointer;
+    animation: popIn 0.5s 0.8s ease-out both;
+    transition: all 0.2s;
+  }
+
+  #finale .restart-btn:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.6);
+    color: #fff;
+  }
+
+</style>
+</head>
+<body>
+
+<div id="intro">
+  <h1>⚠ FAZBEAR ENTERTAINMENT ⚠</h1>
+  <div class="subtitle">Security Camera System v2.0</div>
+  <div class="subtitle" style="margin-bottom:30px; color:#ff660088; font-size:0.7rem;">
+    &mdash;&mdash; BIRTHDAY EDITION &mdash;&mdash;
+  </div>
+  <div class="blink-text" onclick="startGame()" tabindex="0">[ ENTER FACILITY ]</div>
+</div>
+
+<div id="main-ui">
+
+  <div id="topbar">
+    <div class="logo">🐻 FAZBEAR CAMS &nbsp;|&nbsp; BIRTHDAY EDITION</div>
+    <div id="clock">12:00 AM</div>
+    <div class="sys-info">
+      CAM SYS: ONLINE<br>
+      DOORS: LOCKED
+    </div>
+  </div>
+
+  <div id="workspace">
+
+    <div id="camera-feed">
+      <canvas id="noise-canvas"></canvas>
+      <div id="static-overlay"></div>
+
+      <div id="cam-label">● REC &nbsp; CAM 01</div>
+      <div id="cam-corner">
+        MOTION: <span id="motion-status">NONE</span><br>
+        SIGNAL: STABLE<br>
+        NV: ON
+      </div>
+
+      <div class="cam-scene active" id="scene-cam1">
+        <img class="animatronic" src="Freddy.png" alt="Freddy" style="animation-delay:0s">
+        <div class="cam-message">HAPPY BIRTHDAY, EVAN!</div>
+        <div class="cam-sub">[ FREDDY FAZBEAR WISHES YOU WELL ]</div>
+        <div class="cam-name">MAIN STAGE — CAM 01</div>
+      </div>
+
+      <div class="cam-scene" id="scene-cam2">
+        <img class="animatronic" src="Chica.png" alt="Chica" style="animation-delay:0.5s">
+        <div class="cam-message">WISHING YOU A SPOOKY BDAY!</div>
+        <div class="cam-sub">[ CHICA HAS CAKE... SOMEWHERE ]</div>
+        <div class="cam-name">DINING AREA — CAM 02</div>
+      </div>
+
+      <div class="cam-scene" id="scene-cam3">
+        <img class="animatronic" src="Bonnie.png" alt="Bonnie" style="animation-delay:0.3s">
+        <div class="cam-message">EVAN IS THE BIRTHDAY STAR!</div>
+        <div class="cam-sub">[ BONNIE PLAYS YOUR BIRTHDAY SONG ]</div>
+        <div class="cam-name">BACKSTAGE — CAM 03</div>
+      </div>
+
+      <div class="cam-scene" id="scene-cam4">
+        <img class="animatronic" src="Foxy.png" alt="Foxy" style="animation-delay:0.8s">
+        <div class="cam-message">ARRR! HAPPY BIRTHDAY!</div>
+        <div class="cam-sub">[ FOXY IS RUNNIN' DOWN THE HALL FOR YE ]</div>
+        <div class="cam-name">PIRATE COVE — CAM 04</div>
+      </div>
+
+      <div class="cam-scene" id="scene-cam5">
+        <img class="animatronic" src="GoldenFreddy.png" alt="Golden Freddy" style="animation-delay:0.1s; filter:drop-shadow(0 0 30px gold) drop-shadow(0 0 60px gold); opacity:0.85">
+        <div class="cam-message" style="color:gold; text-shadow:0 0 20px gold">IT'S A GOLDEN BIRTHDAY, EVAN!</div>
+        <div class="cam-sub">[ GOLDEN FREDDY BLESSES YOUR YEAR ]</div>
+        <div class="cam-name">SUPPLY CLOSET — CAM 05</div>
+      </div>
+
+      <div class="cam-scene" id="scene-cam6">
+        <img class="animatronic" src="BalloonBoy.png" alt="Balloon Boy" style="animation-delay:0.2s">
+        <div class="cam-message">HI! HA HA! EVAN! HI!</div>
+        <div class="cam-sub">[ BB IS ANNOYINGLY ENTHUSIASTIC FOR YOU ]</div>
+        <div class="cam-name">GAME AREA — CAM 06</div>
+      </div>
+
+      <div class="cam-scene" id="scene-cam7">
+        <img class="animatronic" src="Springtrap.png" alt="Springtrap" style="animation-delay:0.6s; filter:drop-shadow(0 0 30px #00ff41) brightness(0.75)">
+        <div class="cam-message" style="color:#aaffaa">hope... you... enjoy... your... birthday...</div>
+        <div class="cam-sub">[ SPRINGTRAP SENDS GRIM BUT SINCERE WISHES ]</div>
+        <div class="cam-name">OLD PARTS ROOM — CAM 07</div>
+      </div>
+
+      <div class="cam-scene" id="scene-cam8">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;z-index:3;position:relative">
+          <div style="font-size:clamp(0.6rem,1.5vw,1rem); color:#ff0000; letter-spacing:4px; text-shadow:0 0 10px red; animation:blink 0.5s infinite">⚠ WARNING ⚠</div>
+          <div style="font-size:clamp(0.5rem,1.2vw,0.75rem); color:#ff3300; margin-top:10px; letter-spacing:2px">UNKNOWN ENTITY DETECTED</div>
+          <div style="font-size:clamp(0.5rem,1.2vw,0.75rem); color:rgba(255,50,50,0.5); margin-top:6px">...do you dare look?...</div>
+        </div>
+        <div class="cam-name" style="color:rgba(255,0,0,0.4)">????? — CAM 08</div>
+      </div>
+
+    </div>
+
+    <div id="side-panel">
+
+      <div class="panel-box">
+        <div class="panel-title">■ CAMERA SELECT</div>
+        <div id="cam-buttons">
+          <button class="cam-btn active" onclick="switchCam(1, this)">
+            <span class="cam-num">01</span>MAIN STAGE
+          </button>
+          <button class="cam-btn" onclick="switchCam(2, this)">
+            <span class="cam-num">02</span>DINING AREA
+          </button>
+          <button class="cam-btn" onclick="switchCam(3, this)">
+            <span class="cam-num">03</span>BACKSTAGE
+          </button>
+          <button class="cam-btn" onclick="switchCam(4, this)">
+            <span class="cam-num">04</span>PIRATE COVE
+          </button>
+          <button class="cam-btn" onclick="switchCam(5, this)">
+            <span class="cam-num">05</span>SUPPLY CLOSET
+          </button>
+          <button class="cam-btn" onclick="switchCam(6, this)">
+            <span class="cam-num">06</span>GAME AREA
+          </button>
+          <button class="cam-btn" onclick="switchCam(7, this)">
+            <span class="cam-num">07</span>OLD PARTS
+          </button>
+          <button class="cam-btn danger" onclick="switchCam(8, this)">
+            <span class="cam-num">08</span>?????
+          </button>
+        </div>
+      </div>
+
+      <div class="panel-box">
+        <div class="panel-title">■ POWER</div>
+        <div id="power-bar-wrap"><div id="power-bar" style="width:99%"></div></div>
+        <div id="power-label"><span>USAGE: 1%</span><span id="power-pct">99%</span></div>
+      </div>
+
+      <div class="panel-box" id="alert-log" style="flex:1;overflow:hidden">
+        <div class="panel-title">■ ACTIVITY LOG</div>
+        <div id="log-content"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="bottombar">
+    <div class="status">
+      <span><span class="status-dot"></span>CAM SYS ONLINE</span>
+      <span><span class="status-dot" style="background:var(--amber);box-shadow:0 0 6px var(--amber)"></span>ANIMATRONICS: ACTIVE</span>
+      <span><span class="status-dot"></span>DOORS: LOCKED</span>
+    </div>
+    <div style="font-size:clamp(0.4rem,1vw,0.65rem);color:var(--dim-green)">
+      FAZBEAR ENTERTAINMENT · BIRTHDAY SECURITY SYSTEM · NIGHT 1
+    </div>
+  </div>
+
+</div>
+
+<div id="jumpscare-scene" onclick="showFinale()">
+  <div id="scream-bars"></div>
+  <img id="jumpscare-img" src="Markiplier.png" alt="Markiplier"
+       onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Mark_Fischbach_at_VidCon_2017_%28cropped%29.jpg/440px-Mark_Fischbach_at_VidCon_2017_%28cropped%29.jpg'">
+  <div id="jumpscare-text">HAPPY BIRTHDAY EVAN!!!</div>
+  <div id="jumpscare-sub">[ CLICK ANYWHERE TO CONTINUE ]</div>
+</div>
+
+<div id="finale">
+  <h1>🎂 HAPPY BIRTHDAY EVAN! 🎂</h1>
+  <div class="emoji-row">🎉🎈🎊🥳🎁🎀🎉</div>
+  <p style="font-size:clamp(0.8rem,2vw,1.3rem); color:rgba(255,220,150,0.95); margin-bottom:14px; line-height:1.8; animation: popIn 0.5s 0.3s ease-out both;">
+    Hey Evan 💛<br>
+    I hope this made you smile, even just a little.<br>
+    You deserve the absolute world, and I mean that.<br>
+    You're one of the most genuinely amazing people I know,<br>
+    and I'm so lucky to have you in my life. 🌙
+  </p>
+  <p style="font-size:clamp(0.7rem,1.6vw,1.05rem); color:rgba(255,180,100,0.85); margin-bottom:10px; line-height:1.9; animation: popIn 0.5s 0.5s ease-out both;">
+    On your birthday, I just want you to know:<br>
+    you are loved, you are celebrated, and you matter<br>
+    way more than you probably realize. 🌸<br>
+    I hope this year brings you everything you've been dreaming of<br>
+    and more surprises than you can handle. 🎁
+  </p>
+  <p style="font-size:clamp(0.65rem,1.4vw,0.95rem); color:rgba(200,200,255,0.7); letter-spacing:2px; animation: popIn 0.5s 0.7s ease-out both;">
+    With all the love in the world<br>
+    <span style="font-family:'Creepster',cursive; font-size:clamp(1.2rem,3vw,2rem); color:rgba(255,200,100,0.9); text-shadow:0 0 15px rgba(255,180,50,0.5); letter-spacing:4px;">Majd 💛</span>
+  </p>
+  <p style="font-size:clamp(0.45rem,1vw,0.65rem); color:rgba(0,255,65,0.35); letter-spacing:3px; margin-top:6px; animation: popIn 0.5s 0.9s ease-out both;">
+    [ Freddy, Bonnie, Chica, Foxy, Golden Freddy, BB, Springtrap & Markiplier co-sign this message ]
+  </p>
+  <button class="restart-btn" onclick="location.reload()">[ PLAY AGAIN ]</button>
+</div>
+
+<script>
+function updateClock() {
+  const now = new Date();
+  const h = now.getHours() % 12 || 12;
+  const m = String(now.getMinutes()).padStart(2, '0');
+  const ampm = now.getHours() < 12 ? 'AM' : 'PM';
+  document.getElementById('clock').textContent = `${h}:${m} ${ampm}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+const canvas = document.getElementById('noise-canvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+}
+
+function drawNoise() {
+  if (!canvas.offsetWidth) { requestAnimationFrame(drawNoise); return; }
+  resizeCanvas();
+  const imageData = ctx.createImageData(canvas.width, canvas.height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const v = Math.random() * 255;
+    data[i] = v; data[i+1] = v; data[i+2] = v; data[i+3] = 255;
+  }
+  ctx.putImageData(imageData, 0, 0);
+  requestAnimationFrame(drawNoise);
+}
+
+const logs = [
+  { text: '00:01 > SYSTEM BOOT... OK', cls: '' },
+  { text: '00:01 > CAMERAS ONLINE (8/8)', cls: '' },
+  { text: '00:02 > EVAN\'S BIRTHDAY DETECTED', cls: 'log-warn' },
+  { text: '00:02 > ANIMATRONICS: FESTIVE MODE', cls: '' },
+  { text: '00:03 > CAM 01: FREDDY ACTIVE', cls: '' },
+  { text: '00:04 > CAM 04: FOXY CURTAIN OPEN', cls: 'log-warn' },
+  { text: '00:05 > CAM 05: GOLDEN ENTITY', cls: 'log-warn' },
+  { text: '00:06 > CAM 08: SIGNAL ANOMALY', cls: 'log-err' },
+  { text: '00:07 > UNKNOWN SIGNAL — CAM 08', cls: 'log-err' },
+  { text: '00:08 > !! DO NOT VIEW CAM 08 !!', cls: 'log-err' },
+];
+
+function addLog(entry, delay) {
+  setTimeout(() => {
+    const el = document.createElement('div');
+    el.className = 'log-line ' + entry.cls;
+    el.textContent = entry.text;
+    const lc = document.getElementById('log-content');
+    lc.appendChild(el);
+    if (lc.children.length > 12) lc.removeChild(lc.children[0]);
+  }, delay);
+}
+
+let power = 99;
+function drainPower() {
+  power = Math.max(0, power - 0.15);
+  document.getElementById('power-bar').style.width = power + '%';
+  document.getElementById('power-pct').textContent = Math.round(power) + '%';
+  document.querySelector('#power-label span').textContent = 'USAGE: ' + (100 - Math.round(power)) + '%';
+  if (power < 30) {
+    document.getElementById('power-bar').style.background = 'linear-gradient(90deg, #aa0000, #ff2200)';
+    document.getElementById('power-bar').style.boxShadow = '0 0 6px #ff2200';
+  }
+}
+
+const motionStates = ['NONE', 'NONE', 'LOW', 'NONE', 'HIGH', 'NONE', 'MEDIUM', 'CRITICAL'];
+let currentCam = 1;
+
+function updateMotion(cam) {
+  document.getElementById('motion-status').textContent = motionStates[cam - 1] || 'NONE';
+}
+
+function doStaticTransition(cb) {
+  const overlay = document.getElementById('static-overlay');
+  overlay.style.display = 'block';
+  overlay.style.background = '#fff';
+  
+  let flickers = 0;
+  const flicker = setInterval(() => {
+    overlay.style.opacity = Math.random() > 0.5 ? Math.random() * 0.8 : 0;
+    flickers++;
+    if (flickers > 8) {
+      clearInterval(flicker);
+      overlay.style.display = 'none';
+      overlay.style.opacity = 0;
+      cb();
+    }
+  }, 40);
+}
+
+function switchCam(num, btn) {
+  if (num === 8) {
+    doStaticTransition(() => {
+      document.querySelectorAll('.cam-scene').forEach(s => s.classList.remove('active'));
+      document.getElementById('scene-cam8').classList.add('active');
+      document.getElementById('cam-label').textContent = '● REC   CAM 0' + num;
+      updateMotion(num);
+      document.querySelectorAll('.cam-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      setTimeout(() => triggerJumpscare(), 1200);
+    });
+    return;
+  }
+
+  doStaticTransition(() => {
+    document.querySelectorAll('.cam-scene').forEach(s => s.classList.remove('active'));
+    document.getElementById('scene-cam' + num).classList.add('active');
+    document.getElementById('cam-label').textContent = '● REC   CAM 0' + num;
+    document.querySelectorAll('.cam-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCam = num;
+    updateMotion(num);
+  });
+}
+
+function triggerJumpscare() {
+  const flash = document.createElement('div');
+  flash.className = 'red-flash';
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 400);
+
+  try {
+    const ctx2 = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx2.createOscillator();
+    const gain = ctx2.createGain();
+    osc.connect(gain);
+    gain.connect(ctx2.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(880, ctx2.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(110, ctx2.currentTime + 0.5);
+    gain.gain.setValueAtTime(0.3, ctx2.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime + 0.7);
+    osc.start();
+    osc.stop(ctx2.currentTime + 0.7);
+  } catch(e) {}
+
+  setTimeout(() => {
+    const js = document.getElementById('jumpscare-scene');
+    js.classList.add('active');
+  }, 150);
+}
+
+function showFinale() {
+  document.getElementById('jumpscare-scene').classList.remove('active');
+  document.getElementById('finale').classList.add('active');
+  spawnConfetti();
+}
+
+function spawnConfetti() {
+  const colors = ['#ff6600','#ffcc00','#ff2299','#00ffcc','#ff88ff','#66ff00','#ffffff'];
+  for (let i = 0; i < 80; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti-piece';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.top = '-20px';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.transform = `rotate(${Math.random()*360}deg)`;
+    c.style.animationDuration = (2 + Math.random() * 3) + 's';
+    c.style.animationDelay = (Math.random() * 2) + 's';
+    c.style.width = (6 + Math.random() * 10) + 'px';
+    c.style.height = (6 + Math.random() * 10) + 'px';
+    document.getElementById('finale').appendChild(c);
+  }
+  setInterval(spawnConfetti, 3500);
+}
+
+function startGame() {
+  document.getElementById('intro').style.display = 'none';
+  const ui = document.getElementById('main-ui');
+  ui.style.display = 'flex';
+
+  drawNoise();
+
+  logs.forEach((entry, i) => addLog(entry, i * 800));
+
+  setInterval(drainPower, 500);
+
+  setInterval(() => {
+    const states = ['NONE','NONE','NONE','LOW','MEDIUM','HIGH'];
+    document.getElementById('motion-status').textContent =
+      states[Math.floor(Math.random() * states.length)];
+    setTimeout(() => {
+      document.getElementById('motion-status').textContent = motionStates[currentCam - 1] || 'NONE';
+    }, 800);
+  }, 5000);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const intro = document.getElementById('intro');
+    if (intro.style.display !== 'none' && !intro.hidden) startGame();
+  }
+});
+</script>
+</body>
+</html>
